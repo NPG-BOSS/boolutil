@@ -1,5 +1,5 @@
 # Założenia projektu
----
+
 - [ ] Aplikacja z GUI pozwalająca na:
     - [ ] Wpisanie funkcji logicznej przez użytkownika
     - [ ] Utwożenie funkcji logicznej za pomocą tabeli prawdy
