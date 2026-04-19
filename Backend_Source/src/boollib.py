@@ -83,34 +83,36 @@ def simplify_expression(expression):
             print(f"Error simplifying expression: {e}")
             return None 
 
-def logic_to_nand_form(expression):
-    """
-    Converts expression to form which can be implemented using only NAND gates.
-    It checks top level operator, changes it to nand form and then recursively calls itself on the arguments of the operator.
-    """
-    if expression.is_Atom:
-        return expression
+def logic_to_nand_style(expr):
+    # 1. Base Case: If it's a variable, we're done
+    if expr.is_Atom:
+        return expr
 
-    if isinstance(expression, Not):
-        a = logic_to_nand_form(expression.args[0])
-        return Nand(a, a)
+    # 2. Check for Double Negation: ~(~A) -> A
+    # If the current gate is a NOT and the child is also a NOT, skip both
+    if isinstance(expr, Not) and isinstance(expr.args[0], Not):
+        return logic_to_nand_style(expr.args[0].args[0])
 
-    if isinstance(expression, Or):
-        args = list(expression.args)
-        #expr = binarize(Or, args)
-        a, b = expression.args
-        a, b = logic_to_nand_form(a), logic_to_nand_form(b)
-        return Nand(Nand(a, a), Nand(b, b))
+    # 3. Recursively convert all child arguments
+    args = [logic_to_nand_style(arg) for arg in expr.args]
 
-    if isinstance(expression, And):
-        args = list(expression.args)
-        #expr = binarize(And, args)
-        a, b = expression.args
-        a, b = logic_to_nand_form(a), logic_to_nand_form(b)
-        t = Nand(a, b)
-        return Nand(t, t)
+    # Helper: Visual NAND gate ~(A & B)
+    def NAND_GATE(*inputs):
+        return Not(And(*inputs, evaluate=False), evaluate=False)
 
-    raise ValueError(expression)    
+    # 4. NAND Mapping
+    if isinstance(expr, Not):
+        return Not(args[0])
+
+    if isinstance(expr, And):
+        inner = NAND_GATE(*args)
+        return NAND_GATE(inner, inner)
+
+    if isinstance(expr, Or):
+        not_args = [Not(a) for a in args]
+        return Nand(*not_args)
+
+    return expr    
 
 if __name__ == "__main__":
 
@@ -124,5 +126,5 @@ if __name__ == "__main__":
         print(f"Processed: {processed}")
         processed = simplify_expression(processed)
         print(f"Simplified: {processed}")
-        processed = logic_to_nand_form(processed)
+        processed = logic_to_nand_style(processed)
         print(f"Nandified: {processed}")
