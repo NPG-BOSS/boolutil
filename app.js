@@ -1,11 +1,10 @@
-
 document.body.innerHTML = '';
 
 // ==========================================
 // SEKCJA 1: Wpisanie funkcji ręcznie
 // ==========================================
 const sekcjaTekstowa = document.createElement('div');
-sekcjaTekstowa.style.marginBottom = '40px'; // Odstęp od dołu
+sekcjaTekstowa.style.marginBottom = '40px'; 
 
 const tytul1 = document.createElement('h3');
 tytul1.innerText = '1. Wpisz funkcję logiczną z klawiatury:';
@@ -36,7 +35,6 @@ tytul2.innerText = '2. Lub wygeneruj tabelę prawdy:';
 const etykieta = document.createElement('label');
 etykieta.innerText = 'Liczba zmiennych (np. 3): ';
 
-
 const poleIloscZmiennych = document.createElement('input');
 poleIloscZmiennych.type = 'number';
 poleIloscZmiennych.value = '3';
@@ -48,8 +46,7 @@ poleIloscZmiennych.style.marginRight = '10px';
 const przyciskGeneruj = document.createElement('button');
 przyciskGeneruj.innerText = 'Generuj tabelę';
 
-const kontenerNaTabele = document.createElement('div'); // Tutaj wskoczy nasza tabela
-
+const kontenerNaTabele = document.createElement('div'); 
 
 sekcjaTabeli.appendChild(tytul2);
 sekcjaTabeli.appendChild(etykieta);
@@ -59,9 +56,7 @@ sekcjaTabeli.appendChild(kontenerNaTabele);
 document.body.appendChild(sekcjaTabeli);
 
 
-
 przyciskGeneruj.addEventListener('click', () => {
-    
     kontenerNaTabele.innerHTML = ''; 
     
     const ileZmiennych = parseInt(poleIloscZmiennych.value);
@@ -69,7 +64,7 @@ przyciskGeneruj.addEventListener('click', () => {
     tabela.style.borderCollapse = "collapse";
     tabela.style.marginTop = "20px";
     
-    
+    // Nagłówki
     const wierszNaglowkowy = document.createElement('tr');
     for (let i = 0; i < ileZmiennych; i++) {
         const th = document.createElement('th');
@@ -85,7 +80,7 @@ przyciskGeneruj.addEventListener('click', () => {
     wierszNaglowkowy.appendChild(thWynik);
     tabela.appendChild(wierszNaglowkowy);
 
-    
+    // Generowanie wierszy
     const liczbaWierszy = Math.pow(2, ileZmiennych);
     for (let i = 0; i < liczbaWierszy; i++) {
         const wiersz = document.createElement('tr');
@@ -100,22 +95,26 @@ przyciskGeneruj.addEventListener('click', () => {
             wiersz.appendChild(komorka);
         }
 
-    
         const wynikTd = document.createElement('td');
         wynikTd.style.border = "1px solid black";
         wynikTd.style.padding = "8px";
         
+        // Cykliczny przycisk
+        const poleWyniku = document.createElement('button');
+        poleWyniku.innerText = '0'; 
+        poleWyniku.className = 'wynik-btn'; 
+        poleWyniku.style.width = '40px';
+        poleWyniku.style.height = '30px';
+        poleWyniku.style.cursor = 'pointer';
+        poleWyniku.style.fontWeight = 'bold';
         
-        const poleWyniku = document.createElement('input');
-        poleWyniku.type = 'text';
-        poleWyniku.maxLength = 1; // Zablokuj do 1 znaku
-        poleWyniku.style.width = '30px';
-        poleWyniku.style.textAlign = 'center';
-        
-        
-        poleWyniku.addEventListener('input', (event) => {
-            if (event.target.value !== '0' && event.target.value !== '1') {
-                event.target.value = '';
+        poleWyniku.addEventListener('click', (event) => {
+            if (event.target.innerText === '0') {
+                event.target.innerText = '1';
+            } else if (event.target.innerText === '1') {
+                event.target.innerText = '-';
+            } else {
+                event.target.innerText = '0';
             }
         });
 
@@ -126,12 +125,24 @@ przyciskGeneruj.addEventListener('click', () => {
     
     kontenerNaTabele.appendChild(tabela);
 
-    
+    // PRZYWRÓCONY PRZYCISK WYSYŁANIA
     const przyciskWyslijTabele = document.createElement('button');
     przyciskWyslijTabele.innerText = 'Wyślij wyniki z tabeli';
     przyciskWyslijTabele.style.marginTop = '15px';
     kontenerNaTabele.appendChild(przyciskWyslijTabele);
-});
 
+    // LOGIKA ZBIERANIA DANYCH PODPIĘTA POD PRZYCISK WYSYŁANIA
+    przyciskWyslijTabele.addEventListener('click', () => {
+        const wszystkiePola = kontenerNaTabele.querySelectorAll('.wynik-btn');
+        const zebraneWyniki = [];
+
+        wszystkiePola.forEach(pole => {
+            zebraneWyniki.push(pole.innerText);
+        });
+
+        console.log("Paczka dla backendu:", zebraneWyniki);
+        alert("Zebrano dane! Zobacz konsolę (F12).");
+    });
+});
 
 przyciskGeneruj.click();
