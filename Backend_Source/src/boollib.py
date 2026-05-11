@@ -1,6 +1,19 @@
 import sympy as sp
-from sympy.logic.boolalg import simplify_logic, And, Or, Not, Nand
+from sympy.logic.boolalg import simplify_logic, And, Or, Not, Nand, truth_table
 import re
+
+
+class Expression:
+    def __init__(self, plaintext = None, ttable = None, sympy_expr = None):
+        if plaintext is not None:
+            self.plaintext = plaintext
+            self.sympy_expr = text_to_logic(plaintext)
+            self.ttable = truth_table(self.sympy_expr, self.sympy_expr.atoms(sp.Symbol))
+            self.ttable_readable = list(self.ttable)
+
+
+
+
 
 def text_to_logic(plaintext_expression):
     """
@@ -70,7 +83,7 @@ def text_to_logic(plaintext_expression):
 
     sympy_expr = sp.sympify(processed, locals=sym_dict)
 
-    return processed
+    return sympy_expr
 
     
 def simplify_expression(expression):
@@ -121,7 +134,9 @@ if __name__ == "__main__":
         if test_input == "stop":
             break
         processed = text_to_logic(test_input)
-        
+        a = Expression(plaintext=test_input)
+        print(a.ttable_readable)
+
 
         print(f"Processed: {processed}")
         processed = simplify_expression(processed)
