@@ -4,12 +4,25 @@ import re
 
 
 class Expression:
-    def __init__(self, plaintext = None, ttable_readable = None, sympy_expr = None):
+    def __init__(self, plaintext = None, ttable_readable = None, sympy_expr = None, vars = None):
         if plaintext is not None:
             self.plaintext = plaintext
             self.sympy_expr = text_to_logic(plaintext)
-            #ttable = truth_table(self.sympy_expr, self.sympy_expr.atoms(sp.Symbol))
-            self.ttable_readable = get_minterms_and_dontcares( self.sympy_expr.atoms(sp.Symbol),self.sympy_expr)
+            self.vars = self.sympy_expr.atoms(sp.Symbol)
+            self.ttable_readable = get_minterms_and_dontcares( self.vars,self.sympy_expr)
+        elif sympy_expr is not None:
+            self.sympy_expr = sympy_expr
+            self.vars = self.sympy_expr.atoms(sp.Symbol)
+            self.plaintext = str(sympy_expr)
+            self.ttable_readable = get_minterms_and_dontcares( self.vars,self.sympy_expr)
+        elif ttable_readable is not None and vars is not None:
+            self.ttable_readable = ttable_readable
+            self.vars = vars
+            self.sympy_expr = sp.logic.boolalg.SOPform(vars, ttable_readable[0], ttable_readable[1])
+            self.plaintext = str(self.sympy_expr)
+        else:
+            raise ValueError("Invalid input: Provide either plaintext, sympy_expr, or ttable_readable with vars.")
+            
 
 
 
