@@ -4,16 +4,31 @@ import re
 
 
 class Expression:
-    def __init__(self, plaintext = None, ttable = None, sympy_expr = None):
+    def __init__(self, plaintext = None, ttable_readable = None, sympy_expr = None):
         if plaintext is not None:
             self.plaintext = plaintext
             self.sympy_expr = text_to_logic(plaintext)
-            self.ttable = truth_table(self.sympy_expr, self.sympy_expr.atoms(sp.Symbol))
-            self.ttable_readable = list(self.ttable)
+            #ttable = truth_table(self.sympy_expr, self.sympy_expr.atoms(sp.Symbol))
+            self.ttable_readable = get_minterms_and_dontcares( self.sympy_expr.atoms(sp.Symbol),self.sympy_expr)
 
 
 
+def get_minterms_and_dontcares(expr, vars):
+    """
+    Evaluates a sympy expression to find minterm indices.
+    """
+    # Create a truth table: returns a list of result values (True/False/None)
+    # The order follows the binary representation of the row index
+    table = list(truth_table(vars, expr))
+    print(table)
+    
+    minterms = [i[0] for i in table if i[1] == True]
+    print(minterms)
 
+    dontcares = [i[0] for i  in table if i[1] == None]
+    print(dontcares)
+    
+    return minterms, dontcares
 
 def text_to_logic(plaintext_expression):
     """
